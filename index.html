@@ -15,17 +15,16 @@
             overflow: hidden;
             text-align: center;
             
-            /* --- FIXED BACKGROUND HERE --- */
-            /* This ensures step3_bg.jpg is always the background */
+            /* --- FIXED BACKGROUND --- */
             background: url('step3_bg.jpg') no-repeat center center fixed;
             background-size: cover; 
         }
 
-        /* Overlay to darken the background slightly so text pops */
+        /* Overlay to darken the background */
         .bg-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.4); /* Darkens the background image by 40% */
+            background: rgba(0, 0, 0, 0.4);
             z-index: 1;
         }
 
@@ -41,13 +40,13 @@
             position: relative;
             transition: all 0.5s ease;
 
-            /* --- ADD THESE 3 LINES --- */
-            max-height: 80vh;       /* Stop it from getting taller than 80% of screen */
-            overflow-y: auto;       /* Turn on scrolling inside the card */
-            scrollbar-width: none;  /* Hide the scrollbar (for Firefox) */
+            /* --- SCROLL FIX FOR MISSING BUTTON --- */
+            max-height: 80vh;       /* limit height */
+            overflow-y: auto;       /* enable scrolling */
+            scrollbar-width: none;  /* hide scrollbar (Firefox) */
         }
 
-        /* --- ADD THIS TO HIDE SCROLLBARS ON CHROME/PHONES --- */
+        /* Hide scrollbar for Chrome/Safari/Phones */
         #container::-webkit-scrollbar { 
             display: none; 
         }
@@ -287,12 +286,10 @@ All I ask is this — say Yes, and let me show you one last surprise."></span>
         }
 
         function nextStep(stepNum) {
-            // REMOVED: Logic that changes the background image. 
-            // The background is now fixed in CSS.
-            
             document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
             document.getElementById('step' + stepNum).classList.add('active');
             
+            // Trigger typewriter ONLY if we are on step 2 or 3
             if (stepNum === 2 || stepNum === 3) {
                 setTimeout(initTypewriter, 500);
             }
@@ -328,22 +325,34 @@ All I ask is this — say Yes, and let me show you one last surprise."></span>
             noCount++;
         }
 
-        // TYPEWRITER EFFECT
+        // --- FIXED TYPEWRITER LOGIC ---
         function initTypewriter() {
-            const typewriters = document.querySelectorAll('.typewriter-text[data-text]');
-            typewriters.forEach((el, index) => {
-                // Only run if not already completed
-                if (!el.classList.contains('typewriter-complete') && el.textContent === "") {
-                    setTimeout(() => {
-                        typeWriter(el, el.getAttribute('data-text'), 0, 65);
-                    }, index * 500);
-                }
-            });
+            // Find which step is currently active (Step 2 or Step 3)
+            const activeStep = document.querySelector('.step.active');
+            
+            if (activeStep) {
+                // Find the typewriter box ONLY inside that active step
+                const typewriters = activeStep.querySelectorAll('.typewriter-text[data-text]');
+                
+                typewriters.forEach((el, index) => {
+                    // Check if it's already done or started. If text is empty, start it.
+                    if (!el.classList.contains('typewriter-complete') && el.textContent === "") {
+                        setTimeout(() => {
+                            // Speed set to 40ms for slightly faster typing
+                            typeWriter(el, el.getAttribute('data-text'), 0, 40); 
+                        }, index * 500);
+                    }
+                });
+            }
         }
 
         function typeWriter(element, text, i, speed) {
             if (i < text.length) {
                 element.textContent = text.substring(0, i + 1);
+                // Scroll to bottom of container as it types
+                const container = document.getElementById('container');
+                container.scrollTop = container.scrollHeight;
+                
                 setTimeout(() => typeWriter(element, text, i + 1, speed), speed + Math.random() * 20);
             } else {
                 element.classList.add('typewriter-complete');
@@ -487,7 +496,6 @@ All I ask is this — say Yes, and let me show you one last surprise."></span>
             requestAnimationFrame(animateParticles);
         }
 
-        // ENHANCED HEART ANIMATION WITH CHANGING TEXT
         function launchHearts() {
             for(let i = 0; i < 30; i++) {
                 setTimeout(() => {
@@ -507,14 +515,12 @@ All I ask is this — say Yes, and let me show you one last surprise."></span>
                     `;
                     document.body.appendChild(heart);
                     
-                    // Animate up and fade
                     setTimeout(() => {
                         const randomX = (Math.random() - 0.5) * 200;
                         heart.style.transform = `translateY(-130vh) translateX(${randomX}px) rotate(${Math.random() * 20 - 10}deg) scale(1.2)`;
                         heart.style.opacity = '0';
                     }, 200 + i * 50);
                     
-                    // Remove after animation
                     setTimeout(() => {
                         if (heart.parentNode) heart.remove();
                     }, 5200 + i * 50);
