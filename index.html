@@ -89,9 +89,29 @@
         }
         .timeline-item img { width: 100%; height: 100%; object-fit: cover; }
 
-        .game-container { position: relative; height: 150px; margin-top: 20px; }
+        .game-container {
+            position: relative;
+            height: 150px;
+            margin-top: 20px;
+            overflow: hidden; /* prevents page jump */
+        }
+
         #yesBtn { background: #ff4d6d; color: white; border: none; padding: 15px 35px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1.2em; }
-        #noBtn { background: #adb5bd; color: white; border: none; padding: 10px 20px; border-radius: 50px; position: absolute; cursor: pointer; white-space: nowrap; }
+        #noBtn {
+            background: #adb5bd;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            position: absolute;              /* CHANGED */
+            cursor: pointer;
+            white-space: nowrap;
+            left: 60%;
+            top: 70%;
+            transform: translate(-50%, -50%);
+            transition: all 0.25s ease;       /* smooth dodge */
+        }
+
 
         .bouquet { font-size: 100px; margin-bottom: 10px; }
 
@@ -249,7 +269,7 @@ All I ask is this — say Yes, and let me show you one last surprise."></span>
 
         <div id="step5" class="step">
             <h2>The Big Question</h2>
-            <p>I want to upgrade our "connection" to the next version. Would you give this 1st-year student the honor of being your Valentine?</p>
+            <p>I want to upgrade our "connection" to the next version. Would you give this 1st-year student the honor of being someone more than just friends?</p>
             <div class="game-container">
                 <button id="yesBtn" onclick="celebrate()">YES! ❤️</button>
                 <button id="noBtn" onmouseover="moveNo()">No</button>
@@ -316,14 +336,29 @@ All I ask is this — say Yes, and let me show you one last surprise."></span>
 
         function moveNo() {
             const noBtn = document.getElementById('noBtn');
-            const x = Math.random() * (window.innerWidth - 150);
-            const y = Math.random() * (window.innerHeight - 50);
-            noBtn.style.position = 'fixed';
-            noBtn.style.left = x + 'px'; noBtn.style.top = y + 'px';
-            const messages = ["Think Again!!", "Don't test my Patience! 😤", "Yes is best ROI !!"];
+            const container = document.querySelector('.game-container');
+
+            const maxX = container.clientWidth - noBtn.offsetWidth;
+            const maxY = container.clientHeight - noBtn.offsetHeight;
+
+            const x = Math.random() * maxX;
+            const y = Math.random() * maxY;
+
+            noBtn.style.left = x + 'px';
+            noBtn.style.top = y + 'px';
+
+            const messages = [
+                "Think again 😏",
+                "Nice try 😉",
+                "Wrong choice 😤",
+                "Yes is better ❤️",
+                "Nope 😄"
+            ];
+
             noBtn.innerText = messages[noCount % messages.length];
             noCount++;
         }
+
 
         // --- FIXED TYPEWRITER LOGIC ---
         function initTypewriter() {
@@ -527,6 +562,22 @@ All I ask is this — say Yes, and let me show you one last surprise."></span>
                 }, i * 100);
             }
         }
+        /* 🔁 AUTO CYCLE: explode → reform (CHANGE 2) */
+setInterval(() => {
+    // Force explode
+    exploded = true;
+    cycleState = 'exploding';
+    cycleTimer = 0;
+
+    // Reform after explosion
+    setTimeout(() => {
+        exploded = false;
+        cycleState = 'forming';
+        cycleTimer = 0;
+    }, 2200);
+
+}, 7000); // every 7 seconds
+
     </script>
 </body>
 </html>
